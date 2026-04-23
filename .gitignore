@@ -1,0 +1,6 @@
+.env
+assets/uploads/*
+assets/backups/*
+!assets/uploads/.gitkeep
+!assets/backups/.gitkeep
+data/

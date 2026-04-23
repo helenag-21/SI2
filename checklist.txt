@@ -1,0 +1,13 @@
+Vytváranie, upravovanie a ukladanie zápisov -> hlavna obrazovka
+Možnosť priloženia príloh k zápisom -> pridat zapis, tam to je vpravo dole
+Kategorizácia zápisov -> pridat zapis, dropdown
+Vlastné prispôsobiteľné šablóny -> pridat zapis, dropdown
+Exportovanie denníkov a zápisov -> koliecko vpravo hore v menu (stiahne sa ti json ale to je momentalne jedno, button tam je)
+Nastavenie formátu exportu -> stlacenie export ukaze modal s vyberom
+Lokálne zálohovanie súborov -> kolecko, zalohovanie dat
+Obnovovanie záloh -> neni zatial
+Uzamykanie súborov -> dennik cely defaultne  alebo zapis pri editaci. Ak sa vytvara tak to tam neni
+Odomykanie súborov pomocou hesla -> no dialog sa ukaze ale nefunguje odomykanie. V entries.json staci ale prepisat locked na false a da sa editovat
+Odomykanie súborov pomocou biometrie -> to iste co hore
+Nastavenie jazyku aplikácie -> kolecko, je tam ENG a SK zatial
+Importovanie denníkov a zápisov -> kolecko, su tam 2 buttony

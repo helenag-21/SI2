@@ -1,0 +1,53 @@
+services:
+
+  app:
+    build: .
+    container_name: dennik_app
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - .:/var/www/html
+      - uploads:/var/www/html/assets/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-dennik}
+      DB_USER: ${DB_USER:-dennik_user}
+      DB_PASS: ${DB_PASS}
+
+  db:
+    image: mysql:8.0
+    container_name: dennik_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-dennik}
+      MYSQL_USER: ${DB_USER:-dennik_user}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASS}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  code-server:
+    image: codercom/code-server:latest
+    container_name: dennik_editor
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/home/coder/project
+    environment:
+      PASSWORD: ${CODE_SERVER_PASS}
+    command: --auth password /home/coder/project
+
+volumes:
+  db_data:
+  uploads:

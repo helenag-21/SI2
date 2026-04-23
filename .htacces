@@ -1,0 +1,7 @@
+Options -Indexes
+RewriteEngine On
+
+# Presmeruj na index ak nie je prihlásený (zabezpečenie)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L]
