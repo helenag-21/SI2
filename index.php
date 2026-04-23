@@ -186,7 +186,7 @@ function togglePassword(inputId, btn) {
 <script>
 function checkScreenSize() {
     const warning = document.getElementById('screen-warning');
-    if (window.innerWidth < 640) {
+    if (window.innerWidth < 1024) {
         warning.classList.remove('hidden');
     } else {
         warning.classList.add('hidden');

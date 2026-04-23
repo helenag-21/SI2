@@ -243,3 +243,18 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
         reader.readAsText(file);
     }
 </script>
+
+<!-- Upozornenie pre malé obrazovky -->
+<div id="screen-warning" class="hidden fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50 p-8 text-center">
+    <div class="text-8xl mb-6">🖥️</div>
+    <h2 class="text-2xl font-bold text-white mb-4">Takto to nebude fungovať!</h2>
+    <p class="text-gray-300 max-w-sm">Táto aplikácia je optimalizovaná pre väčšie obrazovky. Skúste to znova na tablete alebo počítači s väčšou obrazovkou.</p>
+</div>
+<script>
+function checkScreenSize() {
+    const warning = document.getElementById('screen-warning');
+    warning.classList.toggle('hidden', window.innerWidth >= 1024);
+}
+checkScreenSize();
+window.addEventListener('resize', checkScreenSize);
+</script>
