@@ -11,29 +11,37 @@ if (empty($_SESSION['user_id'])) {
     exit;
 }
 
-$userId = $_SESSION['user_id'];
+$userId = (int)$_SESSION['user_id'];
 
-// Prijať JSON zo žiadosti
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (!is_array($input)) {
+if (!is_array($input) || empty($input)) {
     echo json_encode(['success' => false, 'error' => 'Neplatný JSON formát.']);
     exit;
 }
 
-// Nájsť alebo vytvoriť denník "Import"
-$stmt = $pdo->prepare("SELECT PK_ID_dennik FROM Dennik WHERE FK_ID_pouzivatel = ? AND nazov = 'Import' LIMIT 1");
-$stmt->execute([$userId]);
+// Zisti názov denníka z prvého záznamu
+$diaryName = null;
+foreach ($input as $item) {
+    if (is_array($item) && !empty($item['diary'])) {
+        $diaryName = trim($item['diary']) . ' [import]';
+        break;
+    }
+}
+$diaryName = $diaryName ?? 'Import';
+
+// Nájsť alebo vytvoriť denník
+$stmt = $pdo->prepare("SELECT PK_ID_dennik FROM Dennik WHERE FK_ID_pouzivatel = ? AND nazov = ? LIMIT 1");
+$stmt->execute([$userId, $diaryName]);
 $importDiary = $stmt->fetchColumn();
 
 if (!$importDiary) {
-    $pdo->prepare("INSERT INTO Dennik (FK_ID_pouzivatel, nazov) VALUES (?, 'Import')")
-        ->execute([$userId]);
+    $pdo->prepare("INSERT INTO Dennik (FK_ID_pouzivatel, nazov) VALUES (?, ?)")
+        ->execute([$userId, $diaryName]);
     $importDiary = $pdo->lastInsertId();
 }
 
 $imported = 0;
-$errors   = 0;
 
 try {
     $pdo->beginTransaction();
@@ -56,7 +64,7 @@ try {
     }
 
     $pdo->commit();
-    echo json_encode(['success' => true, 'imported' => $imported]);
+    echo json_encode(['success' => true, 'imported' => $imported, 'diary' => $diaryName]);
 
 } catch (Exception $e) {
     $pdo->rollBack();

@@ -17,6 +17,7 @@ services:
       DB_NAME: ${DB_NAME:-dennik}
       DB_USER: ${DB_USER:-dennik_user}
       DB_PASS: ${DB_PASS}
+      DEPLOY_SECRET: ${DEPLOY_SECRET}
 
   db:
     image: mysql:8.0
@@ -26,6 +27,7 @@ services:
       MYSQL_DATABASE: ${DB_NAME:-dennik}
       MYSQL_USER: ${DB_USER:-dennik_user}
       MYSQL_PASSWORD: ${DB_PASS}
+      DEPLOY_SECRET: ${DEPLOY_SECRET}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
     volumes:
       - db_data:/var/lib/mysql

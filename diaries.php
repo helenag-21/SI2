@@ -8,6 +8,18 @@ if (empty($_SESSION['user_id'])) {
 }
 $userId = $_SESSION['user_id'];
 
+// === PREMENOVANIE DENNÍKA ===
+if (isset($_POST["rename"])) {
+    $id    = (int)($_POST["id"] ?? 0);
+    $nazov = trim($_POST["nazov"] ?? "");
+    if ($id > 0 && $nazov !== "") {
+        $pdo->prepare("UPDATE Dennik SET nazov = ? WHERE PK_ID_dennik = ? AND FK_ID_pouzivatel = ?")
+            ->execute([$nazov, $id, $userId]);
+    }
+    header("Location: diaries.php");
+    exit;
+}
+
 // === VYTVORENIE DENNÍKA ===
 if (isset($_POST['create'])) {
     $nazov = trim($_POST['nazov'] ?? '');
@@ -112,9 +124,27 @@ $userName = $userStmt->fetchColumn() ?: 'Používateľ';
                 <div class="bg-white rounded-2xl shadow hover:shadow-xl transition <?= $isLocked ? 'opacity-90' : '' ?>">
                     <div class="p-8">
                         <div class="flex justify-between items-start mb-6">
-                            <h3 class="text-2xl font-bold text-gray-800">
-                                <?= htmlspecialchars($d['nazov']) ?>
-                            </h3>
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-gray-800" id="title-<?= $d['PK_ID_dennik'] ?>">
+                                    <?= htmlspecialchars($d['nazov']) ?>
+                                </h3>
+                                <form method="POST" class="hidden mt-1" id="rename-form-<?= $d['PK_ID_dennik'] ?>">
+                                    <input type="hidden" name="id" value="<?= $d['PK_ID_dennik'] ?>">
+                                    <div class="flex gap-2">
+                                        <input type="text" name="nazov" value="<?= htmlspecialchars($d['nazov']) ?>"
+                                               class="flex-1 px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <button type="submit" name="rename" class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-sm">✓</button>
+                                        <button type="button" onclick="cancelRename(<?= $d['PK_ID_dennik'] ?>)" class="px-3 py-1 bg-gray-200 rounded-lg text-sm">✕</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <button onclick="startRename(<?= $d['PK_ID_dennik'] ?>, '<?= addslashes(htmlspecialchars($d['nazov'])) ?>')"
+                                    class="text-gray-400 hover:text-indigo-600 transition ml-2" title="Premenovať">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </button>
                             <?php if ($d['is_locked']): ?>
                                 <span class="text-orange-600">
                                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,6 +223,18 @@ $userName = $userStmt->fetchColumn() ?: 'Používateľ';
         document.getElementById('lockModal').classList.remove('hidden');
         document.querySelector('#lockModal input[type=password]').focus();
     }
+</script>
+<script>
+function startRename(id, current) {
+    document.getElementById('title-' + id).classList.add('hidden');
+    const form = document.getElementById('rename-form-' + id);
+    form.classList.remove('hidden');
+    form.querySelector('input[name="nazov"]').focus();
+}
+function cancelRename(id) {
+    document.getElementById('title-' + id).classList.remove('hidden');
+    document.getElementById('rename-form-' + id).classList.add('hidden');
+}
 </script>
 </body>
 </html>
