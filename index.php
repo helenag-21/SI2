@@ -53,6 +53,7 @@ if (isset($_POST['register'])) {
 
                 $pdo->commit();
                 $success = "Účet bol úspešne vytvorený! Teraz sa prihláste.";
+                $meno = $priezvisko = $email_raw = "";
             } catch (Exception $e) {
                 $pdo->rollBack();
                 $error = "Chyba pri registrácii: " . $e->getMessage();
