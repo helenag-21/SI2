@@ -8,6 +8,9 @@ if (empty($_SESSION['user_id'])) {
 }
 $userId = $_SESSION['user_id'];
 
+// Vynuluj odomknuté záznamy pri návrate na denník
+unset($_SESSION["unlocked_entries"]);
+
 // --- ID denníka ---
 $dennikId = $_GET['id'] ?? null;
 if (!$dennikId) die('Chýba ID denníka.');

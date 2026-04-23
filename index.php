@@ -19,7 +19,16 @@ if (isset($_POST['register'])) {
         $error = "Vyplňte Meno aj Priezvisko!";
     } elseif ($pass1 !== $pass2) {
         $error = "Heslá sa nezhodujú!";
-    } elseif (strlen($pass1) < 4) { // Zvýšenie minimálnej dĺžky hesla pre lepšie zabezpečenie
+    } elseif (strlen($pass1) < 8) {
+        $error = "Heslo musí mať aspoň 8 znakov.";
+    } elseif (!preg_match('/[A-Z]/', $pass1)) {
+        $error = "Heslo musí obsahovať aspoň jedno veľké písmeno.";
+    } elseif (!preg_match('/[a-z]/', $pass1)) {
+        $error = "Heslo musí obsahovať aspoň jedno malé písmeno.";
+    } elseif (!preg_match('/[0-9]/', $pass1)) {
+        $error = "Heslo musí obsahovať aspoň jedno číslo.";
+    } elseif (!preg_match('/[\W_]/', $pass1)) {
+        $error = "Heslo musí obsahovať aspoň jeden špeciálny znak."; //
         $error = "Heslo musí mať aspoň 4 znaky!";
     } else {
         // 1. Kontrola existencie e-mailu v tabuľke Pouzivatel
@@ -114,14 +123,29 @@ if (isset($_POST['login'])) {
 
         <div class="bg-white/10 rounded-2xl p-8">
             <h2 class="text-3xl font-bold text-white text-center mb-8">Registrácia</h2>
-            <form method="POST" class="space-y-5">
+            <form method="POST" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="text" name="meno" required placeholder="Meno" class="px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none" value="<?= htmlspecialchars($meno ?? '') ?>">
-                    <input type="text" name="priezvisko" required placeholder="Priezvisko" class="px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none" value="<?= htmlspecialchars($priezvisko ?? '') ?>">
+                    <div>
+                        <label class="block text-white/80 text-sm mb-1">Meno <span class="text-red-400">*</span></label>
+                        <input type="text" name="meno" required placeholder="Meno" class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none" value="<?= htmlspecialchars($meno ?? '') ?>">
+                    </div>
+                    <div>
+                        <label class="block text-white/80 text-sm mb-1">Priezvisko <span class="text-red-400">*</span></label>
+                        <input type="text" name="priezvisko" required placeholder="Priezvisko" class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none" value="<?= htmlspecialchars($priezvisko ?? '') ?>">
+                    </div>
                 </div>
-                <input type="email" name="email" required placeholder="E-mail" class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none" value="<?= htmlspecialchars($email ?? '') ?>">
-                <input type="password" name="password" required placeholder="Heslo (min. 8 znakov)" class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none">
-                <input type="password" name="password2" required placeholder="Heslo znova" class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none">
+                <div>
+                    <label class="block text-white/80 text-sm mb-1">E-mail <span class="text-red-400">*</span></label>
+                    <input type="email" name="email" required placeholder="vas@email.com" class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none" value="<?= htmlspecialchars($email ?? '') ?>">
+                </div>
+                <div>
+                    <label class="block text-white/80 text-sm mb-1">Heslo <span class="text-red-400">*</span></label>
+                    <input type="password" name="password" required placeholder="Min. 8 znakov, A-z, 0-9, špeciálny znak" class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-white/80 text-sm mb-1">Heslo znova <span class="text-red-400">*</span></label>
+                    <input type="password" name="password2" required placeholder="Zopakuj heslo" class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/30 text-white placeholder-white/60 focus:ring-4 focus:ring-primary focus:outline-none">
+                </div>
                 <button name="register" class="w-full bg-green-600 py-4 rounded-xl font-bold text-white hover:bg-green-700 transition text-lg">Vytvoriť účet</button>
             </form>
         </div>

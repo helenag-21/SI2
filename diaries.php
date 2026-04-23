@@ -8,6 +8,9 @@ if (empty($_SESSION['user_id'])) {
 }
 $userId = $_SESSION['user_id'];
 
+// Vynuluj odomknuté denníky pri návrate na prehľad
+unset($_SESSION["unlocked_diaries"]);
+
 // === PREMENOVANIE DENNÍKA ===
 if (isset($_POST["rename"])) {
     $id    = (int)($_POST["id"] ?? 0);
