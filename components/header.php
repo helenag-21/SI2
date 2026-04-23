@@ -90,9 +90,6 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
                             <?= t('backup_data') ?>
                         </a>
 
-                        <a href="backup.php#restore" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                            <?= t('recovery_data') ?>
-                        </a>
 
                         <!-- EXPORT WITH FORMAT CHOICE -->
                         <a href="#" onclick="event.preventDefault(); document.getElementById('exportModal').classList.remove('hidden')"

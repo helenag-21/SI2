@@ -1,6 +1,7 @@
 <?php
 // components/functions.php
 
+date_default_timezone_set("Europe/Bratislava");
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
