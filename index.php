@@ -29,7 +29,6 @@ if (isset($_POST['register'])) {
         $error = "Heslo musí obsahovať aspoň jedno číslo.";
     } elseif (!preg_match('/[\W_]/', $pass1)) {
         $error = "Heslo musí obsahovať aspoň jeden špeciálny znak."; //
-        $error = "Heslo musí mať aspoň 4 znaky!";
     } else {
         // 1. Kontrola existencie e-mailu v tabuľke Pouzivatel
         $check = $pdo->prepare("SELECT 1 FROM Pouzivatel WHERE email = ?");
