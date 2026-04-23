@@ -1,5 +1,6 @@
 <?php
 // config/db.php
+require_once __DIR__ . "/../classes/autoload.php";
 
 $host = getenv('DB_HOST') ?: 'localhost';
 $name = getenv('DB_NAME') ?: 'projekt_db';
