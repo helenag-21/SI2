@@ -15,6 +15,9 @@ unset($_SESSION["unlocked_entries"]);
 $dennikId = $_GET['id'] ?? null;
 if (!$dennikId) die('Chýba ID denníka.');
 
+// --- Vyhľadávací výraz ---
+$query = trim($_GET['q'] ?? '');
+
 // --- Overenie vlastníctva + načítanie denníka ---
 $stmt = $pdo->prepare("
     SELECT d.*, z.hash_hesla IS NOT NULL AS is_locked, z.PK_ID_zabezpecenie
@@ -42,35 +45,48 @@ if (isset($_POST['lock_diary'])) {
     if (strlen($password) >= 4) {
         $hash = password_hash($password, PASSWORD_BCRYPT);
         if ($dennik['PK_ID_zabezpecenie']) {
-            // Aktualizuj existujúce zabezpečenie
             $pdo->prepare("UPDATE Zabezpecenie SET hash_hesla = ? WHERE PK_ID_zabezpecenie = ?")
                     ->execute([$hash, $dennik['PK_ID_zabezpecenie']]);
         } else {
-            // Vytvor nové zabezpečenie
             $pdo->prepare("INSERT INTO Zabezpecenie (FK_ID_pouzivatel, typ_zabezpecenia, hash_hesla) VALUES (?, 'password', ?)")
                     ->execute([$userId, $hash]);
             $secId = $pdo->lastInsertId();
             $pdo->prepare("UPDATE Dennik SET FK_ID_zabezpecenie = ? WHERE PK_ID_dennik = ?")
                     ->execute([$secId, $dennikId]);
         }
-        unset($_SESSION['unlocked_diaries'][$dennikId]); // vynúti nové zadanie hesla
+        unset($_SESSION['unlocked_diaries'][$dennikId]);
         header("Location: diary.php?id=$dennikId");
         exit;
     }
 }
 
-// --- Načítanie zápisov ---
-$stmt = $pdo->prepare("
-    SELECT z.PK_ID_zapis AS id, z.nazov AS title, z.obsah AS content, z.datum_upravy AS date,
-           k.nazov AS category,
-           zb.hash_hesla IS NOT NULL AS locked
-    FROM Zapis z
-    LEFT JOIN Kategoria k ON z.FK_ID_kategoria = k.PK_ID_kategoria
-    LEFT JOIN Zabezpecenie zb ON z.FK_ID_zabezpecenie = zb.PK_ID_zabezpecenie
-    WHERE z.FK_ID_dennik = ?
-    ORDER BY z.datum_upravy DESC
-");
-$stmt->execute([$dennikId]);
+// --- Načítanie zápisov (s vyhľadávaním) ---
+if ($query !== '') {
+    $stmt = $pdo->prepare("
+        SELECT z.PK_ID_zapis AS id, z.nazov AS title, z.obsah AS content, z.datum_upravy AS date,
+               k.nazov AS category,
+               zb.hash_hesla IS NOT NULL AS locked
+        FROM Zapis z
+        LEFT JOIN Kategoria k ON z.FK_ID_kategoria = k.PK_ID_kategoria
+        LEFT JOIN Zabezpecenie zb ON z.FK_ID_zabezpecenie = zb.PK_ID_zabezpecenie
+        WHERE z.FK_ID_dennik = ? AND (z.nazov LIKE ? OR z.obsah LIKE ?)
+        ORDER BY z.datum_upravy DESC
+    ");
+    $like = "%$query%";
+    $stmt->execute([$dennikId, $like, $like]);
+} else {
+    $stmt = $pdo->prepare("
+        SELECT z.PK_ID_zapis AS id, z.nazov AS title, z.obsah AS content, z.datum_upravy AS date,
+               k.nazov AS category,
+               zb.hash_hesla IS NOT NULL AS locked
+        FROM Zapis z
+        LEFT JOIN Kategoria k ON z.FK_ID_kategoria = k.PK_ID_kategoria
+        LEFT JOIN Zabezpecenie zb ON z.FK_ID_zabezpecenie = zb.PK_ID_zabezpecenie
+        WHERE z.FK_ID_dennik = ?
+        ORDER BY z.datum_upravy DESC
+    ");
+    $stmt->execute([$dennikId]);
+}
 $entries = $stmt->fetchAll();
 ?>
 
@@ -133,8 +149,36 @@ $entries = $stmt->fetchAll();
             </form>
         </div>
     <?php else: ?>
-        <!-- NORMÁLNY ZOZNAM ZÁPISOV -->
-        <?php if (empty($entries)): ?>
+
+        <!-- VYHĽADÁVANIE -->
+        <form method="GET" class="mb-8 flex gap-3">
+            <input type="hidden" name="id" value="<?= $dennikId ?>">
+            <input type="text" name="q" value="<?= htmlspecialchars($query) ?>"
+                   placeholder="Vyhľadať v zápisoch..."
+                   class="flex-1 px-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-400 outline-none">
+            <button type="submit"
+                    class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition">
+                Hľadať
+            </button>
+            <?php if ($query): ?>
+                <a href="diary.php?id=<?= $dennikId ?>"
+                   class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition">
+                    Zrušiť filter
+                </a>
+            <?php endif; ?>
+        </form>
+
+        <!-- ZOZNAM ZÁPISOV -->
+        <?php if ($query && empty($entries)): ?>
+            <div class="text-center py-20">
+                <p class="text-xl text-gray-500">
+                    Neboli nájdené žiadne zápisy pre „<?= htmlspecialchars($query) ?>".
+                </p>
+                <a href="diary.php?id=<?= $dennikId ?>" class="mt-4 inline-block text-indigo-600 hover:underline">
+                    Zobraziť všetky zápisy
+                </a>
+            </div>
+        <?php elseif (empty($entries)): ?>
             <div class="text-center py-20">
                 <p class="text-2xl text-gray-600 mb-8">Zatiaľ nemáš žiadny zápis.</p>
                 <a href="entry.php?dennik=<?= $dennikId ?>" class="inline-block bg-primary text-white px-10 py-4 rounded-xl hover:bg-indigo-700 transition shadow-lg font-bold text-lg">
@@ -142,6 +186,11 @@ $entries = $stmt->fetchAll();
                 </a>
             </div>
         <?php else: ?>
+            <?php if ($query): ?>
+                <p class="text-sm text-gray-500 mb-4">
+                    Výsledky pre „<?= htmlspecialchars($query) ?>": <?= count($entries) ?> zápisov
+                </p>
+            <?php endif; ?>
             <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 <?php foreach ($entries as $e): ?>
                     <div class="bg-white rounded-2xl shadow hover:shadow-xl transition cursor-pointer"
@@ -175,7 +224,6 @@ $entries = $stmt->fetchAll();
         <form method="POST">
             <input type="password" name="lock_password" required placeholder="Nové heslo (min. 4 znaky)"
                    class="w-full px-6 py-4 rounded-xl border border-gray-300 focus:ring-4 focus:ring-primary outline-none text-center text-lg mb-6">
-
             <div class="flex gap-4">
                 <button name="lock_diary" class="flex-1 bg-orange-600 text-white py-4 rounded-xl font-bold hover:bg-orange-700 transition">
                     Zamknúť heslom
@@ -186,7 +234,6 @@ $entries = $stmt->fetchAll();
                 </button>
             </div>
         </form>
-
         <div class="mt-8 text-center">
             <button onclick="alert('Biometria bude v ďalšej verzii')"
                     class="text-indigo-600 hover:text-indigo-800 font-medium">
