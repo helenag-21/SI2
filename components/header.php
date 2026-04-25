@@ -1,6 +1,5 @@
 <?php
 require_once 'components/functions.php';
-$searchQuery = $_GET['q'] ?? '';
 $currentLang = $_SESSION['lang'] ?? 'sk';
 ?>
 
@@ -19,21 +18,6 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
                         <?= t('entries') ?>
                     </a>
 
-			<form method="GET" action="<?= basename($_SERVER['PHP_SELF']) ?>" class="flex items-center">
-			    <?php if (!empty($_GET['id'])): ?>
-			        <input type="hidden" name="id" value="<?= (int)$_GET['id'] ?>">
-			    <?php endif; ?>
-			<input type="text" name="q" value="<?= htmlspecialchars($searchQuery) ?>"
-                               placeholder="<?= t('search_placeholder') ?>"
-                               class="w-80 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
-                        <button type="submit" class="ml-3 px-5 py-2 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-primary hover:text-bg-indigo-700 hover:border-primary transition font-medium flex items-center gap-2 shadow-sm">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                            <?= t('search_button') ?>
-                        </button>
-                    </form>
                 </div>
             </div>
 
