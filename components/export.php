@@ -70,6 +70,7 @@ if ($format === 'html') {
     echo ".meta{color:#888;font-size:.9em;margin-bottom:16px}.entry{margin-bottom:48px}</style></head><body>";
     echo "<h1>Export denníka</h1><p style='color:#888'>Exportované: " . date('j. n. Y H:i') . "</p><hr>";
 
+    $scope = $_GET['scope'] ?? 'text';
     foreach ($entries as $e) {
         echo "<div class='entry'>";
         echo "<h2>" . htmlspecialchars($e['title'] ?: 'Bez názvu') . "</h2>";
@@ -79,6 +80,18 @@ if ($format === 'html') {
         echo " &nbsp;·&nbsp; " . date('j. n. Y H:i', strtotime($e['updated']));
         echo "</div>";
         echo "<div>" . nl2br(htmlspecialchars($e['content'])) . "</div>";
+        if ($scope === 'full') {
+            $attStmt = $pdo->prepare("SELECT nazov_suboru, typ_suboru, cesta_suboru FROM Priloha WHERE FK_ID_zapis = ?");
+            $attStmt->execute([$e['id']]);
+            $atts = $attStmt->fetchAll();
+            if ($atts) {
+                echo "<div class='attachments'><strong>Prílohy:</strong><ul>";
+                foreach ($atts as $att) {
+                    echo "<li><a href='/" . htmlspecialchars($att['cesta_suboru']) . "'>" . htmlspecialchars($att['nazov_suboru']) . "</a></li>";
+                }
+                echo "</ul></div>";
+            }
+        }
         echo "</div>";
     }
 

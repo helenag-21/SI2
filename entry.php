@@ -109,8 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['lock_entry']) && !is
                 $ext = pathinfo($_FILES['attachments']['name'][$key], PATHINFO_EXTENSION);
                 $filename = uniqid('att_') . '.' . $ext;
                 move_uploaded_file($tmp, __DIR__ . "/assets/uploads/$filename");
-                $pdo->prepare("INSERT INTO Priloha (FK_ID_zapis, nazov_suboru, typ_suboru) VALUES (?, ?, ?)")
-                        ->execute([$zapisId, $filename, $_FILES['attachments']['type'][$key]]);
+                $pdo->prepare("INSERT INTO Priloha (FK_ID_zapis, nazov_suboru, typ_suboru, velkost, cesta_suboru) VALUES (?, ?, ?, ?, ?)")
+                        ->execute([$zapisId, $filename, $_FILES['attachments']['type'][$key], $_FILES['attachments']['size'][$key], 'assets/uploads/' . $filename]);
             }
         }
     }

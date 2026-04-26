@@ -164,7 +164,8 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
 <script>
 function doExport(format) {
     const diaryId = document.getElementById('export-diary').value;
-    let url = '/components/export.php?format=' + format;
+    const scope = document.querySelector('input[name="export-scope"]:checked').value;
+    let url = '/components/export.php?format=' + format + '&scope=' + scope;
     if (diaryId) url += '&dennik=' + diaryId;
     window.location.href = url;
     document.getElementById('exportModal').classList.add('hidden');
