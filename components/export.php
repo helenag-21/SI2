@@ -43,6 +43,14 @@ if ($dennikId) {
 $entries = $stmt->fetchAll();
 $date    = date('Y-m-d');
 
+if (empty($entries)) {
+    header('Content-Type: text/html; charset=utf-8');
+    echo "<!DOCTYPE html><html lang='sk'><head><meta charset='UTF-8'>";
+    echo "<script>alert('V denníku sa nenachádzajú žiadne zápisy. Export nemožno vykonať.'); history.back();</script>";
+    echo "</head><body></body></html>";
+    exit;
+}
+
 if ($format === 'txt') {
     header('Content-Type: text/plain; charset=utf-8');
     header("Content-Disposition: attachment; filename=\"export-denniok-$date.txt\"");
