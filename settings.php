@@ -44,7 +44,7 @@ if (!empty($_POST['template_name']) && !empty($_POST['template_content'])) {
 // === VYMAZANIE KATEGÓRIE ===
 if (isset($_GET['del_cat'])) {
     $nazov = $_GET['del_cat'];
-    $pdo->prepare("DELETE FROM Kategoria WHERE nazov = ?")->execute([$userId, $nazov]);
+    $pdo->prepare("DELETE FROM Kategoria WHERE nazov = ? AND FK_ID_pouzivatel = ?")->execute([$nazov, $userId]);
     header('Location: settings.php');
     exit;
 }
