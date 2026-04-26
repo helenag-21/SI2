@@ -52,10 +52,11 @@ if (isset($_POST['unlock_entry'])) {
     $stmt = $pdo->prepare("SELECT z2.hash_hesla FROM Zapis z LEFT JOIN Zabezpecenie z2 ON z.FK_ID_zabezpecenie = z2.PK_ID_zabezpecenie WHERE z.PK_ID_zapis = ?");
     $stmt->execute([$zapisId]);
     $hash = $stmt->fetchColumn();
-
     if ($hash && password_verify($password, $hash)) {
         $_SESSION['unlocked_entries'][$zapisId] = true;
         $isLocked = false;
+    } else {
+        setFlash('error', 'Nesprávne heslo.');
     }
 }
 
@@ -154,6 +155,14 @@ if ($isEdit && isset($_GET['delete'])) {
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
 <?php include 'components/header.php'; ?>
+<?php $flash = getFlash(); ?>
+<?php if ($flash): ?>
+    <div class="max-w-4xl mx-auto w-full px-6 pt-6">
+        <div class="p-4 rounded-xl <?= $flash['type'] === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200' ?>">
+            <?= htmlspecialchars($flash['message']) ?>
+        </div>
+    </div>
+<?php endif; ?>
 
 <div class="flex-1 max-w-4xl mx-auto w-full px-4 py-8">
     <div class="bg-white rounded-2xl shadow-xl p-8">
