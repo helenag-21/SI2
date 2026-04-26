@@ -25,23 +25,33 @@ if (!empty($_POST['new_category'])) {
 
 // === PRIDANIE ŠABLÓNY ===
 if (!empty($_POST['template_name']) && !empty($_POST['template_content'])) {
-    $nazov    = trim($_POST['template_name']);
-    $title    = trim($_POST['template_title'] ?? '');
-    $content  = $_POST['template_content'];
-
+    $nazov   = trim($_POST['template_name']);
+    $content = $_POST['template_content'];
     if ($nazov !== '') {
-        $check = $pdo->prepare("SELECT 1 FROM Sablona WHERE nazov = ?");
-        $check->execute([$nazov]);
-        if (!$check->fetch()) {
-            $pdo->prepare("INSERT INTO Sablona (FK_ID_pouzivatel, nazov, struktura) VALUES (?, ?, ?)")
+        // Skontroluj limit 15 šablón
+        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM Sablona WHERE FK_ID_pouzivatel = ?");
+        $countStmt->execute([$userId]);
+        $templateCount = $countStmt->fetchColumn();
+
+        if ($templateCount >= 15) {
+            setFlash('error', 'Dosiahli ste maximálny počet šablón (15).');
+        } else {
+            // Skontroluj duplicitný názov
+            $check = $pdo->prepare("SELECT 1 FROM Sablona WHERE nazov = ? AND FK_ID_pouzivatel = ?");
+            $check->execute([$nazov, $userId]);
+            if (!$check->fetch()) {
+                $pdo->prepare("INSERT INTO Sablona (FK_ID_pouzivatel, nazov, struktura) VALUES (?, ?, ?)")
                     ->execute([$userId, $nazov, $content]);
+                setFlash('success', 'Šablóna bola vytvorená.');
+            } else {
+                setFlash('error', 'Šablóna s týmto názvom už existuje.');
+            }
         }
     }
     header('Location: settings.php');
     exit;
 }
 
-// === VYMAZANIE KATEGÓRIE ===
 // === VYMAZANIE KATEGÓRIE ===
 if (isset($_GET['del_cat'])) {
     $nazov = $_GET['del_cat'];
