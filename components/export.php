@@ -87,7 +87,7 @@ if ($format === 'html') {
             if ($atts) {
                 echo "<div class='attachments'><strong>Prílohy:</strong><ul>";
                 foreach ($atts as $att) {
-                    echo "<li><a href='/" . htmlspecialchars($att['cesta_suboru']) . "'>" . htmlspecialchars($att['nazov_suboru']) . "</a></li>";
+                    echo "<li><a href='/assets/uploads/" . htmlspecialchars($att['nazov_suboru']) . "'>" . htmlspecialchars($att['nazov_suboru']) . "</a></li>";
                 }
                 echo "</ul></div>";
             }
