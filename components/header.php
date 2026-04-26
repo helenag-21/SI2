@@ -39,29 +39,9 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
                     </div>
 
                     <div class="py-2">
-                        <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider"><?= t('language') ?></p>
-                        <?php
-                        $langNames = [
-                            'sk'    => 'Slovenčina',
-                            'en'    => 'English',
-                            'de'    => 'Deutsch',
-                            'es'    => 'Español',
-                            'fr'    => 'Français',
-                            'pt_BR' => 'Português (Brasil)',
-                            'ru'    => 'Русский',
-                            'ja'    => '日本語',
-                            'ko'    => '한국어',
-                            'ar'    => 'العربية',
-                            'zh_CN' => '中文（简体）',
-                        ];
-                        foreach ($langNames as $code => $name):
-                            $file = __DIR__ . "/../lang/$code.json";
-                            if (!file_exists($file)) continue;
-                        ?>
-                        <a href="?lang=<?= $code ?>" class="block px-4 py-2 text-sm <?= $currentLang === $code ? 'font-bold text-black' : 'text-gray-700 hover:bg-gray-50' ?>">
-                            <?= $name ?>
+                        <a href="#" onclick="event.preventDefault(); document.getElementById('langModal').classList.remove('hidden'); document.getElementById('settings-menu').classList.add('hidden');" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                            🌐 Zmena jazyka
                         </a>
-                        <?php endforeach; ?>
                     </div>
 
                     <div class="border-t border-gray-100 pt-2">
@@ -107,6 +87,26 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
 </header>
 
 <!-- TOTO BY TU NEMALO BYT ALE NERIESIM -->
+<div id="langModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">🌐 Zmena jazyka</h2>
+        <div class="space-y-2">
+            <?php
+            $langNames = ["sk"=>"Slovenčina","en"=>"English","de"=>"Deutsch","es"=>"Español","fr"=>"Français","pt_BR"=>"Português (Brasil)","ru"=>"Русский","ja"=>"日本語","ko"=>"한국어","ar"=>"العربية","zh_CN"=>"中文（简体）"];
+            $currentLang2 = $_SESSION["lang"] ?? "sk";
+            foreach ($langNames as $code => $name):
+                $file = __DIR__ . "/..\/lang\/$code.json";
+                if (!file_exists($file)) continue;
+            ?>
+            <a href="?lang=<?= $code ?>" class="flex items-center justify-between px-4 py-3 rounded-xl <?= $currentLang2 === $code ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200' : 'text-gray-700 hover:bg-gray-50' ?> transition">
+                <?= $name ?><?php if ($currentLang2 === $code): ?> <span>✓</span><?php endif; ?>
+            </a>
+            <?php endforeach; ?>
+        </div>
+        <button onclick="document.getElementById('langModal').classList.add('hidden')" class="mt-6 w-full text-center text-gray-500 hover:text-gray-700 text-sm">Zavrieť</button>
+    </div>
+</div>
+
 <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
         <div class="text-center mb-6">
