@@ -109,75 +109,67 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
 <!-- TOTO BY TU NEMALO BYT ALE NERIESIM -->
 <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
-        <div class="text-center mb-8">
-            <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 10v6m-4-6v6m8-6v6m-8 4h8a2 2 0 002-2V6a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-            </div>
+        <div class="text-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800"><?= t('export_entries') ?></h2>
             <p class="text-gray-600 mt-2"><?= t('export_choose_format') ?></p>
         </div>
 
-        <div class="space-y-4">
-            <!-- JSON Export -->
-            <a href="/components/export.php?format=json"
-               class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition font-medium">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <span class="text-blue-600 font-bold text-lg">JSON</span>
-                    </div>
-                    <div class="text-left">
-                        <p class="font-semibold">HTML (odporúčané)</p>
-                        <p class="text-xs text-gray-500"><?= t('export_json_desc') ?></p>
-                    </div>
-                </div>
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </a>
-            <!-- HTML Export -->
-            <a href="/components/export.php?format=html"
-               class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition font-medium">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <span class="text-orange-600 font-bold text-lg">HTML</span>
-                    </div>
-                    <div class="text-left">
-                        <p class="font-semibold">HTML</p>
-                        <p class="text-xs text-gray-500"><?= t('export_txt_desc') ?></p>
-                    </div>
-                </div>
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </a>
+        <div class="space-y-4 mb-6">
+            <!-- Výber denníka -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Denník</label>
+                <select id="export-diary" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <option value="">— Všetky denníky —</option>
+                    <?php
+                    $dennikStmt = $pdo->prepare("SELECT PK_ID_dennik, nazov FROM Dennik WHERE FK_ID_pouzivatel = ? ORDER BY nazov");
+                    $dennikStmt->execute([$_SESSION['user_id'] ?? 0]);
+                    foreach ($dennikStmt->fetchAll() as $d):
+                    ?>
+                    <option value="<?= $d['PK_ID_dennik'] ?>"><?= htmlspecialchars($d['nazov']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-            <!-- TXT Export -->
-            <a href="/components/export.php?format=txt"
-               class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition font-medium">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <span class="text-gray-700 font-bold text-lg">TXT</span>
-                    </div>
-                    <div class="text-left">
-                        <p class="font-semibold"><?= t('export_txt') ?></p>
-                        <p class="text-xs text-gray-500"><?= t('export_txt_desc') ?></p>
-                    </div>
+            <!-- Výber rozsahu -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Rozsah</label>
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="export-scope" value="text" checked class="text-indigo-600"> Iba text
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="export-scope" value="full"> Text + prílohy
+                    </label>
                 </div>
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </a>
+            </div>
+
+            <!-- Výber formátu -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Formát</label>
+                <div class="flex gap-3">
+                    <button onclick="doExport('html')" class="flex-1 py-3 bg-orange-100 text-orange-700 rounded-xl font-bold hover:bg-orange-200 transition">HTML</button>
+                    <button onclick="doExport('txt')" class="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition">TXT</button>
+                    <button onclick="doExport('json')" class="flex-1 py-3 bg-blue-100 text-blue-700 rounded-xl font-bold hover:bg-blue-200 transition">JSON</button>
+                </div>
+            </div>
         </div>
 
         <button onclick="document.getElementById('exportModal').classList.add('hidden')"
-                class="mt-6 w-full text-center text-gray-500 hover:text-gray-700 text-sm font-medium">
+                class="w-full text-center text-gray-500 hover:text-gray-700 text-sm font-medium">
             <?= t('cancel') ?>
         </button>
     </div>
 </div>
+
+<script>
+function doExport(format) {
+    const diaryId = document.getElementById('export-diary').value;
+    let url = '/components/export.php?format=' + format;
+    if (diaryId) url += '&dennik=' + diaryId;
+    window.location.href = url;
+    document.getElementById('exportModal').classList.add('hidden');
+}
+</script>
 
 <script>
     const btn = document.getElementById('settings-btn');
