@@ -42,13 +42,32 @@ if (!empty($_POST['template_name']) && !empty($_POST['template_content'])) {
 }
 
 // === VYMAZANIE KATEGÓRIE ===
+// === VYMAZANIE KATEGÓRIE ===
 if (isset($_GET['del_cat'])) {
     $nazov = $_GET['del_cat'];
-    $pdo->prepare("DELETE FROM Kategoria WHERE nazov = ? AND FK_ID_pouzivatel = ?")->execute([$nazov, $userId]);
+    
+    // Najprv zisti ID kategórie
+    $stmt = $pdo->prepare("SELECT PK_ID_kategoria FROM Kategoria WHERE nazov = ? AND FK_ID_pouzivatel = ?");
+    $stmt->execute([$nazov, $userId]);
+    $kat = $stmt->fetch();
+    
+    if ($kat) {
+        // Skontroluj či je kategória používaná
+        $check = $pdo->prepare("SELECT COUNT(*) FROM Zapis WHERE FK_ID_kategoria = ?");
+        $check->execute([$kat['PK_ID_kategoria']]);
+        $count = $check->fetchColumn();
+        
+        if ($count > 0) {
+            setFlash('error', 'Kategóriu nie je možné vymazať – je priradená k ' . $count . ' zápisom.');
+        } else {
+            $pdo->prepare("DELETE FROM Kategoria WHERE PK_ID_kategoria = ? AND FK_ID_pouzivatel = ?")
+                ->execute([$kat['PK_ID_kategoria'], $userId]);
+            setFlash('success', 'Kategória bola vymazaná.');
+        }
+    }
     header('Location: settings.php');
     exit;
 }
-
 // === VYMAZANIE ŠABLÓNY ===
 if (isset($_GET['del_tpl'])) {
     $id = (int)$_GET['del_tpl'];
@@ -77,6 +96,12 @@ $templates  = $pdo->query("SELECT PK_ID_sablona, nazov, struktura FROM Sablona O
 <?php include 'components/header.php'; ?>
 
 <div class="flex-1 max-w-5xl mx-auto w-full px-6 py-10">
+    <?php $flash = getFlash(); ?>
+<?php if ($flash): ?>
+    <div class="mb-6 p-4 rounded-xl <?= $flash['type'] === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200' ?>">
+        <?= htmlspecialchars($flash['message']) ?>
+    </div>
+<?php endif; ?>
     <h1 class="text-4xl font-bold text-gray-800 mb-10">
         <?= t("manage_categories_templates") ?>
     </h1>
