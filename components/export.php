@@ -87,7 +87,8 @@ if ($format === 'html') {
             if ($atts) {
                 echo "<div class='attachments'><strong>Prílohy:</strong><ul>";
                 foreach ($atts as $att) {
-                    echo "<li><a href='/assets/uploads/" . htmlspecialchars($att['nazov_suboru']) . "'>" . htmlspecialchars($att['nazov_suboru']) . "</a></li>";
+                    $baseUrl = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+                    echo "<li><a href='" . $baseUrl . "/assets/uploads/" . htmlspecialchars($att['nazov_suboru']) . "'>" . htmlspecialchars($att['nazov_suboru']) . "</a></li>";
                 }
                 echo "</ul></div>";
             }
