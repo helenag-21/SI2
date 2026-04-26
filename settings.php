@@ -12,11 +12,24 @@ $userId = $_SESSION['user_id'];
 if (!empty($_POST['new_category'])) {
     $nazov = trim($_POST['new_category']);
     if ($nazov !== '') {
-        // Skontroluj duplicitu
-        $check = $pdo->prepare("SELECT 1 FROM Kategoria WHERE nazov = ?");
-        $check->execute([$nazov]);
-        if (!$check->fetch()) {
-            $pdo->prepare("INSERT INTO Kategoria (FK_ID_pouzivatel, nazov) VALUES (?, ?)")->execute([$userId, $nazov]);
+        // Skontroluj limit 10 kategórií
+        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM Kategoria WHERE FK_ID_pouzivatel = ?");
+        $countStmt->execute([$userId]);
+        $catCount = $countStmt->fetchColumn();
+
+        if ($catCount >= 10) {
+            setFlash('error', 'Dosiahli ste maximálny počet kategórií (10).');
+        } else {
+            // Skontroluj duplicitný názov
+            $check = $pdo->prepare("SELECT 1 FROM Kategoria WHERE nazov = ? AND FK_ID_pouzivatel = ?");
+            $check->execute([$nazov, $userId]);
+            if (!$check->fetch()) {
+                $pdo->prepare("INSERT INTO Kategoria (FK_ID_pouzivatel, nazov) VALUES (?, ?)")
+                    ->execute([$userId, $nazov]);
+                setFlash('success', 'Kategória bola vytvorená.');
+            } else {
+                setFlash('error', 'Kategória s týmto názvom už existuje.');
+            }
         }
     }
     header('Location: settings.php');
