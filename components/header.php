@@ -40,7 +40,7 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
 
                     <div class="py-2">
                         <a href="#" onclick="event.preventDefault(); document.getElementById('langModal').classList.remove('hidden'); document.getElementById('settings-menu').classList.add('hidden');" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                            🌐 Zmena jazyka
+                            🌐 <?= t('language') ?>
                         </a>
                     </div>
 
@@ -89,7 +89,7 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
 <!-- TOTO BY TU NEMALO BYT ALE NERIESIM -->
 <div id="langModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">🌐 Zmena jazyka</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">🌐 <?= t('language') ?></h2>
         <div class="space-y-2">
             <?php
             $langNames = ["sk"=>"Slovenčina","en"=>"English","de"=>"Deutsch","es"=>"Español","fr"=>"Français","pt_BR"=>"Português (Brasil)","ru"=>"Русский","ja"=>"日本語","ko"=>"한국어","ar"=>"العربية","zh_CN"=>"中文（简体）"];
