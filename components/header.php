@@ -95,7 +95,7 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
             $langNames = ["sk"=>"Slovenčina","en"=>"English","de"=>"Deutsch","es"=>"Español","fr"=>"Français","pt_BR"=>"Português (Brasil)","ru"=>"Русский","ja"=>"日本語","ko"=>"한국어","ar"=>"العربية","zh_CN"=>"中文（简体）"];
             $currentLang2 = $_SESSION["lang"] ?? "sk";
             foreach ($langNames as $code => $name):
-                $file = __DIR__ . "/..\/lang\/$code.json";
+                $file = __DIR__ . "/../lang/$code.json";
                 if (!file_exists($file)) continue;
             ?>
             <a href="?lang=<?= $code ?>" class="flex items-center justify-between px-4 py-3 rounded-xl <?= $currentLang2 === $code ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200' : 'text-gray-700 hover:bg-gray-50' ?> transition">
