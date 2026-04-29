@@ -45,7 +45,7 @@
   "no_categories": "Zatiaľ žiadne kategórie",
   "confirm_delete_category": "Naozaj chceš vymazať túto kategóriu?",
   "template_name": "Názov šablóny",
-  "template_title": "Názov zápisu (voliteľné)",
+  "template_title": "Názov zápisu",
   "template_content": "Obsah šablóny...",
   "create_template": "Vytvoriť šablónu",
   "no_templates": "Zatiaľ žiadne šablóny",

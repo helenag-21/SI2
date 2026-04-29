@@ -33,7 +33,7 @@
   "no_categories": "Aún no hay categorías",
   "confirm_delete_category": "¿Estás seguro de que quieres eliminar esta categoría?",
   "template_name": "Nombre de la plantilla",
-  "template_title": "Título de la entrada (opcional)",
+  "template_title": "Título de la entrada",
   "template_content": "Contenido de la plantilla...",
   "create_template": "Crear plantilla",
   "no_templates": "Aún no hay plantillas",

@@ -33,7 +33,7 @@
   "no_categories": "لا توجد فئات بعد",
   "confirm_delete_category": "هل أنت متأكد أنك تريد حذف هذه الفئة؟",
   "template_name": "اسم القالب",
-  "template_title": "عنوان الإدخال (اختياري)",
+  "template_title": "عنوان الإدخال",
   "template_content": "محتوى القالب...",
   "create_template": "إنشاء قالب",
   "no_templates": "لا توجد قوالب بعد",

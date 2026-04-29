@@ -33,7 +33,7 @@
   "no_categories": "Категорий пока нет",
   "confirm_delete_category": "Вы уверены, что хотите удалить эту категорию?",
   "template_name": "Название шаблона",
-  "template_title": "Заголовок записи (необязательно)",
+  "template_title": "Заголовок записи",
   "template_content": "Содержимое шаблона...",
   "create_template": "Создать шаблон",
   "no_templates": "Шаблонов пока нет",

@@ -33,7 +33,7 @@
   "no_categories": "아직 카테고리가 없습니다",
   "confirm_delete_category": "이 카테고리를 삭제하시겠습니까?",
   "template_name": "템플릿 이름",
-  "template_title": "항목 제목 (선택 사항)",
+  "template_title": "항목 제목",
   "template_content": "템플릿 내용...",
   "create_template": "템플릿 만들기",
   "no_templates": "아직 템플릿이 없습니다",

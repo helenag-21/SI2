@@ -33,7 +33,7 @@
   "no_categories": "カテゴリはまだありません",
   "confirm_delete_category": "このカテゴリを削除してもよろしいですか？",
   "template_name": "テンプレート名",
-  "template_title": "記録タイトル（任意）",
+  "template_title": "記録タイトル",
   "template_content": "テンプレートの内容...",
   "create_template": "テンプレートを作成",
   "no_templates": "テンプレートはまだありません",

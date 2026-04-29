@@ -33,7 +33,7 @@
   "no_categories": "Ainda sem categorias",
   "confirm_delete_category": "Tem certeza de que deseja excluir esta categoria?",
   "template_name": "Nome do modelo",
-  "template_title": "Título da entrada (opcional)",
+  "template_title": "Título da entrada",
   "template_content": "Conteúdo do modelo...",
   "create_template": "Criar modelo",
   "no_templates": "Ainda sem modelos",

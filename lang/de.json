@@ -33,7 +33,7 @@
   "no_categories": "Noch keine Kategorien",
   "confirm_delete_category": "Sind Sie sicher, dass Sie diese Kategorie löschen möchten?",
   "template_name": "Vorlagenname",
-  "template_title": "Eintragstitel (optional)",
+  "template_title": "Eintragstitel",
   "template_content": "Vorlageninhalt...",
   "create_template": "Vorlage erstellen",
   "no_templates": "Noch keine Vorlagen",

@@ -33,7 +33,7 @@
   "no_categories": "暂无分类",
   "confirm_delete_category": "您确定要删除此分类吗？",
   "template_name": "模板名称",
-  "template_title": "记录标题（可选）",
+  "template_title": "记录标题",
   "template_content": "模板内容...",
   "create_template": "创建模板",
   "no_templates": "暂无模板",
