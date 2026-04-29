@@ -67,8 +67,8 @@ $currentLang = $_SESSION['lang'] ?? 'sk';
                         <!-- IMPORT ENTRIES -->
                         <div class="relative">
                             <label class="block px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 font-medium cursor-pointer">
-                                <?= t('import_entries') ?? 'Importovať zápisy (JSON)' ?>
-                                <input type="file" id="import-file" accept=".json" class="hidden"
+                                <?= t('import_entries') ?? 'Importovať zápisy' ?>
+                                <input type="file" id="import-file" accept=".json,.html" class="hidden"
                                        onchange="importEntries(event)">
                             </label>
                         </div>
@@ -191,22 +191,41 @@ function doExport(format) {
         const file = event.target.files[0];
         if (!file) return;
 
-        if (!confirm('<?= addslashes(t('confirm_import') ?? 'Naozaj chceš naimportovať zápisy? Aktuálne zápisy budú nahradené.') ?>')) {
+        if (!confirm('<?= addslashes(t('confirm_import') ?? 'Naozaj chceš naimportovať zápisy?') ?>')) {
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (!Array.isArray(data)) throw new Error('Invalid format');
+        const isHtml = file.name.endsWith('.html');
 
-                // Send to PHP via fetch
-                fetch('components/import.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                })
+        if (isHtml) {
+            // HTML import cez FormData
+            const formData = new FormData();
+            formData.append('html_file', file);
+            fetch('components/import.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    alert('<?= addslashes(t('import_success') ?? 'Zápisy boli úspešne naimportované!') ?> (' + res.imported + ')');
+                    location.reload();
+                } else {
+                    alert('Chyba: ' + (res.error || 'neznáma'));
+                }
+            });
+        } else {
+            // JSON import
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!Array.isArray(data)) throw new Error('Invalid format');
+                    fetch('components/import.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    })
                     .then(r => r.json())
                     .then(res => {
                         if (res.success) {
@@ -216,11 +235,12 @@ function doExport(format) {
                             alert('Chyba: ' + (res.error || 'neznáma'));
                         }
                     });
-            } catch (err) {
-                alert('<?= addslashes(t('import_error') ?? 'Neplatný JSON súbor') ?>');
-            }
-        };
-        reader.readAsText(file);
+                } catch (err) {
+                    alert('<?= addslashes(t('import_error') ?? 'Neplatný súbor') ?>');
+                }
+            };
+            reader.readAsText(file);
+        }
     }
 </script>
 
