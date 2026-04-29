@@ -187,11 +187,11 @@ if ($isEdit && isset($_GET['delete'])) {
         <?php else: ?>
             <!-- NORMÁLNY EDITOR -->
             <form method="POST" enctype="multipart/form-data" class="space-y-8">
-                <input type="text" name="title" id="title" required placeholder="Názov zápisu"
+                <input type="text" name="title" id="title" placeholder="Názov zápisu"
                        value="<?= htmlspecialchars($entry['nazov'] ?? '') ?>"
                        class="w-full text-3xl font-bold border-0 border-b-4 border-transparent focus:border-primary outline-none pb-3">
 
-                <textarea name="content" id="content" rows="18" required placeholder="Začnite písať..."
+                <textarea name="content" id="content" rows="18" placeholder="Začnite písať..."
                           class="w-full p-5 border-2 border-gray-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-indigo-100 outline-none text-lg leading-relaxed resize-none"><?= htmlspecialchars($entry['obsah'] ?? '') ?></textarea>
 
                 <!-- ... (kategórie, šablóny, prílohy – rovnaké ako predtým) ... -->
