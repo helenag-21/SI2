@@ -339,10 +339,23 @@ if ($isEdit && isset($_GET['delete'])) {
         this.selectedIndex = 0;
     });
 
+    const existingCount = <?= count($attachments) ?>;
+    const maxAttachments = 10;
+
     document.getElementById('file-upload')?.addEventListener('change', function () {
+        const newFiles = Array.from(this.files);
+        const total = existingCount + newFiles.length;
+
+        if (total > maxAttachments) {
+            alert('Maximálny počet príloh je 10. Máte ' + existingCount + ' príloh, môžete pridať ešte ' + (maxAttachments - existingCount) + '.');
+            this.value = '';
+            document.getElementById('file-list').innerHTML = '';
+            return;
+        }
+
         const list = document.getElementById('file-list');
         list.innerHTML = '';
-        Array.from(this.files).forEach(f => {
+        newFiles.forEach(f => {
             list.innerHTML += `<div class="text-xs text-gray-600">${f.name} <span class="text-gray-400">(${(f.size/1024/1024).toFixed(2)} MB)</span></div>`;
         });
     });
