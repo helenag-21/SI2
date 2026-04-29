@@ -109,13 +109,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['lock_entry']) && !is
 
     // Prílohy
     if (!empty($_FILES['attachments']['name'][0])) {
-        foreach ($_FILES['attachments']['tmp_name'] as $key => $tmp) {
-            if ($tmp && $_FILES['attachments']['error'][$key] === UPLOAD_ERR_OK) {
-                $ext = pathinfo($_FILES['attachments']['name'][$key], PATHINFO_EXTENSION);
-                $filename = uniqid('att_') . '.' . $ext;
-                move_uploaded_file($tmp, __DIR__ . "/assets/uploads/$filename");
-                $pdo->prepare("INSERT INTO Priloha (FK_ID_zapis, nazov_suboru, typ_suboru, velkost, cesta_suboru) VALUES (?, ?, ?, ?, ?)")
-                        ->execute([$zapisId, $filename, $_FILES['attachments']['type'][$key], $_FILES['attachments']['size'][$key], 'assets/uploads/' . $filename]);
+        // Skontroluj aktuálny počet príloh
+        $currentCount = $pdo->prepare("SELECT COUNT(*) FROM Priloha WHERE FK_ID_zapis = ?");
+        $currentCount->execute([$zapisId]);
+        $existingCount = (int)$currentCount->fetchColumn();
+        $newFiles = array_filter($_FILES['attachments']['error'], fn($e) => $e === UPLOAD_ERR_OK);
+        $totalCount = $existingCount + count($newFiles);
+
+        if ($totalCount > 10) {
+            setFlash('error', 'Maximálny počet príloh je 10. Aktuálne máte ' . $existingCount . ', môžete pridať ešte ' . (10 - $existingCount) . '.');
+        } else {
+            foreach ($_FILES['attachments']['tmp_name'] as $key => $tmp) {
+                if ($tmp && $_FILES['attachments']['error'][$key] === UPLOAD_ERR_OK) {
+                    $ext = pathinfo($_FILES['attachments']['name'][$key], PATHINFO_EXTENSION);
+                    $filename = uniqid('att_') . '.' . $ext;
+                    move_uploaded_file($tmp, __DIR__ . "/assets/uploads/$filename");
+                    $pdo->prepare("INSERT INTO Priloha (FK_ID_zapis, nazov_suboru, typ_suboru, velkost, cesta_suboru) VALUES (?, ?, ?, ?, ?)")
+                            ->execute([$zapisId, $filename, $_FILES['attachments']['type'][$key], $_FILES['attachments']['size'][$key], 'assets/uploads/' . $filename]);
+                }
             }
         }
     }
