@@ -17,6 +17,9 @@ if (!$dennikId) die('Chýba ID denníka.');
 
 // --- Vyhľadávací výraz ---
 $query = trim($_GET['q'] ?? '');
+$page = max(1, (int)($_GET['page'] ?? 1));
+$perPage = 20;
+$offset = ($page - 1) * $perPage;
 
 // --- Overenie vlastníctva + načítanie denníka ---
 $stmt = $pdo->prepare("
@@ -62,6 +65,12 @@ if (isset($_POST['lock_diary'])) {
 
 // --- Načítanie zápisov (s vyhľadávaním) ---
 if ($query !== '') {
+    // Celkový počet pre stránkovanie
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM Zapis z WHERE z.FK_ID_dennik = ? AND (z.nazov LIKE ? OR z.obsah LIKE ?)");
+    $like = "%$query%";
+    $countStmt->execute([$dennikId, $like, $like]);
+    $totalEntries = $countStmt->fetchColumn();
+
     $stmt = $pdo->prepare("
         SELECT z.PK_ID_zapis AS id, z.nazov AS title, z.obsah AS content, z.datum_upravy AS date,
                k.nazov AS category,
@@ -71,10 +80,15 @@ if ($query !== '') {
         LEFT JOIN Zabezpecenie zb ON z.FK_ID_zabezpecenie = zb.PK_ID_zabezpecenie
         WHERE z.FK_ID_dennik = ? AND (z.nazov LIKE ? OR z.obsah LIKE ?)
         ORDER BY z.datum_upravy DESC
+        LIMIT ? OFFSET ?
     ");
-    $like = "%$query%";
-    $stmt->execute([$dennikId, $like, $like]);
+    $stmt->execute([$dennikId, $like, $like, $perPage, $offset]);
 } else {
+    // Celkový počet pre stránkovanie
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM Zapis z WHERE z.FK_ID_dennik = ?");
+    $countStmt->execute([$dennikId]);
+    $totalEntries = $countStmt->fetchColumn();
+
     $stmt = $pdo->prepare("
         SELECT z.PK_ID_zapis AS id, z.nazov AS title, z.obsah AS content, z.datum_upravy AS date,
                k.nazov AS category,
@@ -84,10 +98,12 @@ if ($query !== '') {
         LEFT JOIN Zabezpecenie zb ON z.FK_ID_zabezpecenie = zb.PK_ID_zabezpecenie
         WHERE z.FK_ID_dennik = ?
         ORDER BY z.datum_upravy DESC
+        LIMIT ? OFFSET ?
     ");
-    $stmt->execute([$dennikId]);
+    $stmt->execute([$dennikId, $perPage, $offset]);
 }
 $entries = $stmt->fetchAll();
+$totalPages = (int)ceil($totalEntries / $perPage);
 ?>
 
 <!DOCTYPE html>
@@ -213,6 +229,35 @@ $entries = $stmt->fetchAll();
                     </div>
                 <?php endforeach; ?>
             </div>
+        <?php endif; ?>
+
+        <!-- STRÁNKOVANIE -->
+        <?php if ($totalPages > 1): ?>
+            <div class="flex justify-center items-center gap-2 mt-10">
+                <?php if ($page > 1): ?>
+                    <a href="diary.php?id=<?= $dennikId ?>&page=<?= $page-1 ?><?= $query ? '&q='.urlencode($query) : '' ?>"
+                       class="px-4 py-2 bg-white border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition">
+                        ← Predchádzajúca
+                    </a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="diary.php?id=<?= $dennikId ?>&page=<?= $i ?><?= $query ? '&q='.urlencode($query) : '' ?>"
+                       class="px-4 py-2 rounded-xl <?= $i === $page ? 'bg-indigo-600 text-white font-bold' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50' ?> transition">
+                        <?= $i ?>
+                    </a>
+                <?php endfor; ?>
+
+                <?php if ($page < $totalPages): ?>
+                    <a href="diary.php?id=<?= $dennikId ?>&page=<?= $page+1 ?><?= $query ? '&q='.urlencode($query) : '' ?>"
+                       class="px-4 py-2 bg-white border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition">
+                        Ďalšia →
+                    </a>
+                <?php endif; ?>
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-3">
+                Strana <?= $page ?> z <?= $totalPages ?> (<?= $totalEntries ?> zápisov)
+            </p>
         <?php endif; ?>
     <?php endif; ?>
 </div>
