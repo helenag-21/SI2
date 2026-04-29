@@ -187,7 +187,7 @@ if ($isEdit && isset($_GET['delete'])) {
         <?php else: ?>
             <!-- NORMÁLNY EDITOR -->
             <form method="POST" enctype="multipart/form-data" class="space-y-8">
-                <input type="text" name="title" id="title" placeholder="Názov zápisu"
+                <input type="text" name="title" id="title" required placeholder="Názov zápisu"
                        value="<?= htmlspecialchars($entry['nazov'] ?? '') ?>"
                        class="w-full text-3xl font-bold border-0 border-b-4 border-transparent focus:border-primary outline-none pb-3">
 
