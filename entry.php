@@ -92,6 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['lock_entry']) && !is
     $content = $_POST['content'] ?? '';
     $catId   = $_POST['category'] === '' ? null : (int)$_POST['category'];
 
+    if (trim($title) === "" && trim($content) === "") {
+        setFlash("error", "Zadajte aspoň názov alebo obsah zápisu.");
+        header("Location: entry.php?dennik=$dennikId");
+        exit;
+    }
     if ($isEdit) {
         $pdo->prepare("UPDATE Zapis SET nazov = ?, obsah = ?, FK_ID_kategoria = ?, datum_upravy = NOW() WHERE PK_ID_zapis = ?")
                 ->execute([$title, $content, $catId, $zapisId]);
